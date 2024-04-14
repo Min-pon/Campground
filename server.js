@@ -10,9 +10,6 @@ dotenv.config({ path: "./config/config.env" });
 
 const app = express();
 
-// Mount routers
-app.use("/api/v1/campgrounds", campgrounds);
-
 // app.get("/", (req, res) => {
 //   res.status(200).json({ success: true, data: { id: 1 } });
 // });
@@ -20,8 +17,21 @@ app.use("/api/v1/campgrounds", campgrounds);
 // Connect to database
 connectDB();
 
+// Body parser
+app.use(express.json());
+
+// Mount routers
+app.use("/api/v1/campgrounds", campgrounds);
+
 const PORT = process.env.PORT || 5000;
-app.listen(
+const server = app.listen(
   PORT,
   console.log("Server running in", process.env.NODE_ENV, "mode on port", PORT)
 );
+
+//Handle unhandled promise rejection
+process.on("unhandledRejection", (err, promise) => {
+  console.log(`Error: ${err.message}`);
+  // Close server & exit process
+  server.close(() => process.exit(1));
+});

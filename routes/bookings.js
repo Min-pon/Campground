@@ -4,8 +4,14 @@ const {
   addBooking,
   getBooking,
 } = require("../controllers/bookings");
+
+const { protect, authorize } = require("../middleware/auth");
+
 const router = express.Router();
 
-router.route("/").get(getBookings).post(addBooking);
+router
+  .route("/")
+  .get(protect, getBookings)
+  .post(protect, authorize("admin", "user"), addBooking);
 router.route("/:id").get(getBooking);
 module.exports = router;

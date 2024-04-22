@@ -88,7 +88,7 @@ exports.login = async (req, res, next) => {
 //@desc Get current Logged in user
 //@route POST /api/v1/auth/me
 //@access Private
-exports.getMe = async (req, res, next) => {
+exports.getInfo = async (req, res, next) => {
     const user = await User.findById(req.user.id);
     res.status(200).json({
         success: true,
@@ -97,11 +97,19 @@ exports.getMe = async (req, res, next) => {
 };
 
 //@desc Update user information
-//@route PUT /api/v1/auth/edit
+//@route PUT /api/v1/auth/:id
 //@access Private
-exports.edit = async (req, res, next) => {
+exports.editInfo = async (req, res, next) => {
     try {
-        const user = await User.findByIdAndUpdate
+        //Create new information
+        req.user = await User.findByIdAndUpdate(req.user.id, req.body, {
+            new: true,
+            runValidatiors: true
+        });
+        res.status(200).json({
+            success:true,
+            data: req.user
+        });
     }catch (err){
         res.status(400).json({success: false})
     }

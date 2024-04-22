@@ -5,24 +5,22 @@ const Campground = require("../models/Campground");
 //@route    GET /api/v1/bookings
 //@access   Public
 exports.getBookings = async (req, res, next) => {
-  // let query;
+  let query;
   //General users can see only their appointments!
-  // if (req.user.role !== "admin") {
-  //   query = Booking.find({ user: req.user.id }).populate({
-  //     path: "booking",
-  //     select: "name province tel",
-  //   });
-  // } else {
-  // query = Booking.find().populate({
-  //   path: "booking",
-  //   select: "name province tel",
-  // });
-  // }
+  if (req.user.role !== "admin") {
+    query = Booking.find({ user: req.user.id }).populate({
+      path: "booking",
+      select: "name province tel",
+    });
+  } else {
+    query = Booking.find().populate({
+      path: "booking",
+      select: "name province tel",
+    });
+  }
 
   try {
-    // const bookings = await query;
-
-    const bookings = await Booking.find();
+    const bookings = await query;
 
     res.status(200).json({
       success: true,

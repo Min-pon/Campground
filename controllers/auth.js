@@ -85,6 +85,28 @@ exports.login = async (req, res, next) => {
   }
 };
 
+//@desc Get current Logged in user
+//@route POST /api/v1/auth/me
+//@access Private
+exports.getMe = async (req, res, next) => {
+    const user = await User.findById(req.user.id);
+    res.status(200).json({
+        success: true,
+        data: user
+    });
+};
+
+//@desc Update user information
+//@route PUT /api/v1/auth/edit
+//@access Private
+exports.edit = async (req, res, next) => {
+    try {
+        const user = await User.findByIdAndUpdate
+    }catch (err){
+        res.status(400).json({success: false})
+    }
+}
+
 //@desc Log user out / clear cookie
 //@route GET api/v1/auth/logout
 //@access Private

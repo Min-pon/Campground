@@ -130,11 +130,13 @@ exports.updateCampground = async (req, res, next) => {
 //@access   Public
 exports.deleteCampground = async (req, res, next) => {
   try {
-    const campground = await Campground.findByIdAndDelete(req.params.id);
+    const campground = await Campground.findById(req.params.id);
 
     if (!campground) {
       return res.status(400).json({ success: false });
     }
+
+    await campground.deleteOne();
 
     res.status(200).json({ success: true, data: {} });
   } catch (err) {

@@ -8,7 +8,13 @@ const {
 } = require("../controllers/campgrounds");
 const router = express.Router();
 
+//Include other resource routers
+const bookingRouter = require("./bookings");
+
 const { protect, authorize } = require("../middleware/auth");
+
+//Re-route into other resource routers
+router.use("/:campgroundId/bookings/", bookingRouter);
 
 router
   .route("/")

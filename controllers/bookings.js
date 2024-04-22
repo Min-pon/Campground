@@ -9,12 +9,12 @@ exports.getBookings = async (req, res, next) => {
   //General users can see only their appointments!
   if (req.user.role !== "admin") {
     query = Booking.find({ user: req.user.id }).populate({
-      path: "booking",
+      path: "campground",
       select: "name province tel",
     });
   } else {
     query = Booking.find().populate({
-      path: "booking",
+      path: "campground",
       select: "name province tel",
     });
   }

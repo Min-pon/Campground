@@ -86,7 +86,7 @@ exports.login = async (req, res, next) => {
 };
 
 //@desc Get current Logged in user
-//@route POST /api/v1/auth/me
+//@route POST /api/v1/auth/info
 //@access Private
 exports.getInfo = async (req, res, next) => {
     const user = await User.findById(req.user.id);
@@ -97,7 +97,7 @@ exports.getInfo = async (req, res, next) => {
 };
 
 //@desc Update user information
-//@route PUT /api/v1/auth/:id
+//@route PUT /api/v1/auth/info
 //@access Private
 exports.editInfo = async (req, res, next) => {
     try {
@@ -128,7 +128,3 @@ exports.logout = async (req, res, next) => {
     data: {},
   });
 };
-
-//@desc Update user information
-//@route PUT /api/v1/edit
-//@access Private

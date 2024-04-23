@@ -1,6 +1,32 @@
 const Booking = require("../models/Booking");
 const Campground = require("../models/Campground");
 
+const isValidDate = (bookings, currentDate) => {
+  if (!bookings) {
+    return true;
+  }
+
+  const allDates = bookings.map((booking) => booking.bookingDate);
+
+  // Check if currentDate is already booked
+  const currentDateObj = new Date(currentDate);
+  for (let i = 0; i < allDates.length; i++) {
+    if (allDates[i].getTime() === currentDateObj.getTime()) {
+      return false;
+    }
+  }
+  // Check if currentDate is adjacent to any booked dates
+  for (const bookedDate of allDates) {
+    const diffTime = Math.abs(currentDateObj - bookedDate);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    if (diffDays === 1) {
+      return false;
+    }
+  }
+
+  return true;
+};
+
 //@desc     Get all bookings
 //@route    GET /api/v1/bookings
 //@access   Public
@@ -89,6 +115,13 @@ exports.addBooking = async (req, res, next) => {
       return res.status(400).json({
         success: false,
         message: `The user with ID ${req.user.id} has already made 3 bookings`,
+      });
+    }
+
+    if (!isValidDate(existedBookings, req.body.bookingDate)) {
+      return res.status(400).json({
+        success: false,
+        message: `The required date ${req.body.bookingDate} is already booked or adjacent to any booked date`,
       });
     }
     const booking = Booking.create(req.body);

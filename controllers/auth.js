@@ -85,6 +85,36 @@ exports.login = async (req, res, next) => {
   }
 };
 
+//@desc Get current Logged in user
+//@route POST /api/v1/auth/info
+//@access Private
+exports.getInfo = async (req, res, next) => {
+    const user = await User.findById(req.user.id);
+    res.status(200).json({
+        success: true,
+        data: user
+    });
+};
+
+//@desc Update user information
+//@route PUT /api/v1/auth/info
+//@access Private
+exports.editInfo = async (req, res, next) => {
+    try {
+        //Create new information
+        req.user = await User.findByIdAndUpdate(req.user.id, req.body, {
+            new: true,
+            runValidatiors: true
+        });
+        res.status(200).json({
+            success:true,
+            data: req.user
+        });
+    }catch (err){
+        res.status(400).json({success: false})
+    }
+}
+
 //@desc Log user out / clear cookie
 //@route GET api/v1/auth/logout
 //@access Private
@@ -98,7 +128,3 @@ exports.logout = async (req, res, next) => {
     data: {},
   });
 };
-
-//@desc Update user information
-//@route PUT /api/v1/edit
-//@access Private

@@ -19,7 +19,7 @@ const isValidDate = (bookings, currentDate) => {
   for (const bookedDate of allDates) {
     const diffTime = Math.abs(currentDateObj - bookedDate);
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    if (diffDays === 1) {
+    if (diffDays <= 2) {
       return false;
     }
   }
@@ -97,7 +97,9 @@ exports.addBooking = async (req, res, next) => {
   try {
     req.body.campground = req.params.campgroundId;
 
-    const campground = await Campground.findById(req.params.campgroundId);
+    const campground = await Campground.findById(
+      req.params.campgroundId
+    ).populate("bookings");
 
     if (!campground) {
       return res.status(404).json({
@@ -122,6 +124,13 @@ exports.addBooking = async (req, res, next) => {
       return res.status(400).json({
         success: false,
         message: `The required date ${req.body.bookingDate} is already booked or adjacent to any booked date`,
+      });
+    }
+
+    if (campground.bookings.length > 10) {
+      return res.status(400).json({
+        success: false,
+        message: `The campground with ID ${campground._id} can't have more than 10 bookings`,
       });
     }
     const booking = Booking.create(req.body);

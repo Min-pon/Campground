@@ -128,3 +128,23 @@ exports.logout = async (req, res, next) => {
     data: {},
   });
 };
+
+//@desc delete account
+//@route DELETE api/v1/auth/delete
+//@access Private
+exports.deleteAccount = async (req, res, next) => {
+  try {
+    const account = await User.findById(req.user.id);
+    if(!account){
+      return res.status(400).json({success: false});
+    }
+    await account.deleteOne();
+    res.status(200).json({
+      success:true,
+      data: {}
+    });
+
+  }catch (err){
+    res.status(400).json({success: false});
+  }
+}

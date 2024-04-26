@@ -38,7 +38,7 @@ exports.register = async (req, res, next) => {
     //create token
     sendTokenResponse(user, 200, res);
   } catch (err) {
-    res.status(400).json({ success: false });
+    res.status(400).json({ success: false, message: err.stack });
     console.log(err.stack);
   }
 };
@@ -89,31 +89,31 @@ exports.login = async (req, res, next) => {
 //@route POST /api/v1/auth/info
 //@access Private
 exports.getInfo = async (req, res, next) => {
-    const user = await User.findById(req.user.id);
-    res.status(200).json({
-        success: true,
-        data: user
-    });
+  const user = await User.findById(req.user.id);
+  res.status(200).json({
+    success: true,
+    data: user,
+  });
 };
 
 //@desc Update user information
 //@route PUT /api/v1/auth/info
 //@access Private
 exports.editInfo = async (req, res, next) => {
-    try {
-        //Create new information
-        req.user = await User.findByIdAndUpdate(req.user.id, req.body, {
-            new: true,
-            runValidatiors: true
-        });
-        res.status(200).json({
-            success:true,
-            data: req.user
-        });
-    }catch (err){
-        res.status(400).json({success: false})
-    }
-}
+  try {
+    //Create new information
+    req.user = await User.findByIdAndUpdate(req.user.id, req.body, {
+      new: true,
+      runValidatiors: true,
+    });
+    res.status(200).json({
+      success: true,
+      data: req.user,
+    });
+  } catch (err) {
+    res.status(400).json({ success: false });
+  }
+};
 
 //@desc Log user out / clear cookie
 //@route GET api/v1/auth/logout
@@ -135,16 +135,15 @@ exports.logout = async (req, res, next) => {
 exports.deleteAccount = async (req, res, next) => {
   try {
     const account = await User.findById(req.user.id);
-    if(!account){
-      return res.status(400).json({success: false});
+    if (!account) {
+      return res.status(400).json({ success: false });
     }
     await account.deleteOne();
     res.status(200).json({
-      success:true,
-      data: {}
+      success: true,
+      data: {},
     });
-
-  }catch (err){
-    res.status(400).json({success: false});
+  } catch (err) {
+    res.status(400).json({ success: false });
   }
-}
+};

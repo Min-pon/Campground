@@ -120,20 +120,22 @@ exports.addBooking = async (req, res, next) => {
       });
     }
 
+    if (campground.bookings.length >= 10) {
+      return res.status(400).json({
+        success: false,
+        message: `The campground with ID ${campground._id} can't have more than 10 bookings`,
+      });
+    }
+
     if (!isValidDate(existedBookings, req.body.bookingDate)) {
       return res.status(400).json({
         success: false,
         message: `The required date ${req.body.bookingDate} is already booked or adjacent to any booked date`,
       });
     }
+    const booking = await Booking.create(req.body);
 
-    if (campground.bookings.length > 10) {
-      return res.status(400).json({
-        success: false,
-        message: `The campground with ID ${campground._id} can't have more than 10 bookings`,
-      });
-    }
-    const booking = Booking.create(req.body);
+    console.log(booking);
 
     res.status(200).json({
       success: true,
@@ -166,6 +168,28 @@ exports.updateBooking = async (req, res, next) => {
       return res.status(401).json({
         success: false,
         message: `User ${req.user.id} is not authorized to update this booking`,
+      });
+    }
+
+    if (req.body.campground) {
+      const campground = await Campground.findById(
+        req.body.campground
+      ).populate("bookings");
+      if (campground.bookings.length >= 10) {
+        return res.status(400).json({
+          success: false,
+          message: `The campground with ID ${campground._id} can't have more than 10 bookings`,
+        });
+      }
+    }
+
+    const existedBookings = await Booking.find({
+      user: booking.user.toString(),
+    });
+    if (!isValidDate(existedBookings, req.body.bookingDate)) {
+      return res.status(400).json({
+        success: false,
+        message: `The required date ${req.body.bookingDate} is already booked or adjacent to any booked date`,
       });
     }
 
@@ -215,6 +239,6 @@ exports.deleteBooking = async (req, res, next) => {
     console.log(err);
     return res
       .status(500)
-      .json({ success: false, message: "Cannot update Booking" });
+      .json({ success: false, message: "Cannot delete Booking" });
   }
 };
